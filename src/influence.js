@@ -31,6 +31,17 @@
   }
   visit([source]);return out.sort((a,b)=>a.sign-b.sign||a.nodes.length-b.nodes.length||a.nodes.join().localeCompare(b.nodes.join()));
  }
+ function directLoops(source){
+  if(!known(source))return [];
+  return M.species.filter(s=>effect(source,s.id)).map(s=>trace([source,s.id,source]));
+ }
+ function teachingPaths(source,target){
+  const all=paths(source,target);if(!all.length)return [];
+  const chosen=all.filter(r=>r.nodes.length===all[0].nodes.length);
+  const opposite=all.find(r=>!chosen.some(c=>c.sign===r.sign));
+  if(opposite)chosen.push(opposite);
+  return chosen;
+ }
  function relationship(a,b){
   const food=id=>M.edges.filter(e=>e[1]===id).map(e=>e[0]),predators=id=>M.edges.filter(e=>e[0]===id).map(e=>e[1]);
   return {direct:effect(a,b),sharedFood:food(a).filter(id=>food(b).includes(id)),sharedPredators:predators(a).filter(id=>predators(b).includes(id)),sameChain:M.chains().some(c=>c.includes(a)&&c.includes(b))};
@@ -38,6 +49,6 @@
  function summary(routes){const positive=routes.filter(r=>r.sign>0).length,negative=routes.filter(r=>r.sign<0).length;
   return {positive,negative,net:positive&&negative?'undetermined':positive?'positive-paths':negative?'negative-paths':'none'};
  }
- const api={effect,trace,paths,loops,relationship,summary};
+ const api={effect,trace,paths,loops,directLoops,teachingPaths,relationship,summary};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.FoodWebInfluence=api;
 })(typeof window==='undefined'?globalThis:window);

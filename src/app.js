@@ -3,7 +3,7 @@
 const M=window.FoodWebModel,I=window.FoodWebInfluence,$=id=>document.getElementById(id),all=s=>[...document.querySelectorAll(s)];
 const name=id=>M.species.find(s=>s.id===id).name,CN=['','一','二','三','四','五'],chains=M.chains();
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const state={mode:'feedback',chain:null,selected:null,playing:false,source:'mouse',target:'hawk',change:1,view:'paths',route:0,step:0,routes:[],elapsed:0,preset:'predation'};
+const state={mode:'feedback',chain:null,selected:null,playing:false,source:'mouse',target:'hawk',change:1,view:'paths',advanced:false,allRoutes:[],route:0,step:0,routes:[],elapsed:0,preset:'predation'};
 let last=0,dialogResume=false;
 function chainMarkup(c){return c.map(name).join('<i>→</i>');}
 function setSelection(title,text){$('selection-line').innerHTML=`<b>${title}</b><span>${text}</span>`;}
@@ -69,8 +69,8 @@ const presets={
  cross:{source:'rabbit',target:'frog',path:['rabbit','hawk','frog']},
  multiple:{source:'hawk',target:'mouse',path:['hawk','mouse']}
 };
-cards.stability={title:'先看影响，再闭合回路判断负反馈',body:`<h3>两种生物的关系，不等于反馈回路</h3><p>鼠增多使鹰得到更多食物，是从鼠到鹰的影响。还要继续看：鹰的增长又增强对鼠的捕食，<strong>作用回到鼠，抑制鼠最初的增长</strong>，这才构成负反馈。</p><p class="callout">鼠增多 → 鹰增长受促进 → 鼠增长受抑制。<br>负反馈抑制最初的变化；并不保证立刻回到原数量。</p><h3>竞争、隔级和跨链，怎样分析？</h3><p><strong>共享资源：</strong>鼠增多 → 草受取食压力增强 → 兔的食物减少，是经过草传递的竞争作用。<br><strong>间隔营养级：</strong>蛙增多 → 食草昆虫受捕食压力增强 → 草受取食压力减弱，是沿链的间接影响。<br><strong>非同一食物链：</strong>兔与蛙可经共同捕食者鹰相互联系，即使没有一条捕食食物链同时包含兔与蛙。</p><h3>同一对生物，可以有相反路径</h3><p>鹰直接捕食鼠，对鼠有抑制作用；鹰抑制蛇，又可能减轻蛇对鼠的捕食。这两条路径方向相反，不能只看其中一条，或用路径数量“多数表决”。</p><h3>怎样辨认回路性质？</h3><p>本页“闭合反馈”只列起点以外不重复节点、经过观察种群并回到起点的回路。闭合后反向作用于初始变化，标为负反馈；同向强化初始变化，标为正反馈。<strong>竞争和跨链作用不自动等于负反馈。</strong></p><p>真实生态系统中，多条回路同时作用。整体能否稳定，还取决于作用强度、密度制约、时滞和外界条件，不能仅凭某一负反馈回路作保证。</p>`};
-cards.model={title:'本页分析的是机制路径，不是数量预测',body:`<h3>从食物网建立影响方向</h3><p>灰色箭头始终表示<strong>食物 → 取食者</strong>。彩色箭头表示当前追踪的种群影响：食物对取食者有正向支持（＋），取食者对食物种群有负向作用（−）。影响方向与能量流动方向不同；反向影响不意味着能量逆向流动。</p><h3>符号怎样理解？</h3><p>＋ 表示前者增多时，对后者增长有促进趋势；− 表示前者增多时，对后者增长有抑制趋势。若前者减少，沿该作用的响应方向反转。沿一条路径依次推演，假设其他作用暂不改变。动画步骤是逻辑顺序，不是实测响应时间。</p><p>生物旁的 ↑ / ↓ 表示<strong>该路径带来的变化趋势</strong>，不是整网最终数量。回到起点的“反馈”标记表示对最初变化的反馈作用，不表示已经越过初始基准。</p><h3>怎样处理多路径？</h3><p>路径枚举覆盖 7 种生物的全部 42 组不同种群的有序组合。开放路径不重复节点；闭合回路只在末尾重复起点。全部路线可用下拉列表切换，较短路径优先。正向和反向影响并存时，整网净变化标为待定，不按路线条数估计强弱。</p><p>只考虑本图所列取食联系。共享资源的竞争、共同天敌的间接作用通过中间生物展开；未另加竞争边，避免重复计算。未建模的行为、食性转换、资源补给与时滞可能改变真实结果。</p><p class="source">知识核对：<a href="https://www.nature.com/articles/ncomms12644" target="_blank" rel="noopener">Frost 等，2016：跨食物网的共同天敌作用与多路径预测</a>；<a href="https://www.biointeractive.org/sites/default/files/Trophic-Cascade-card-activity.pdf" target="_blank" rel="noopener">HHMI BioInteractive：营养级联课堂活动</a>。</p>`};
+cards.stability={title:'先看影响，再闭合回路判断负反馈',body:`<h3>两种生物的关系，不等于反馈回路</h3><p>鼠增多使鹰得到更多食物，是从鼠到鹰的影响。还要继续看：鹰的增长又增强对鼠的捕食，<strong>作用回到鼠，抑制鼠最初的增长</strong>，这才构成负反馈。</p><p class="callout">鼠增多 → 鹰增长受促进 → 鼠增长受抑制。<br>负反馈抑制最初的变化；并不保证立刻回到原数量。</p><h3>竞争、隔级和跨链，怎样分析？</h3><p><strong>共享资源：</strong>鼠增多 → 草受取食压力增强 → 兔的食物减少，是经过草传递的竞争作用。<br><strong>间隔营养级：</strong>蛙增多 → 食草昆虫受捕食压力增强 → 草受取食压力减弱，是沿链的间接影响。<br><strong>非同一食物链：</strong>兔与蛙可经共同捕食者鹰相互联系，即使没有一条捕食食物链同时包含兔与蛙。</p><h3>同一对生物，可以有相反路径</h3><p>鹰直接捕食鼠，对鼠有抑制作用；鹰抑制蛇，又可能减轻蛇对鼠的捕食。这两条路径方向相反，不能只看其中一条，或用路径数量“多数表决”。</p><h3>怎样辨认回路性质？</h3><p>本页“闭合反馈”默认只看起始种群与一个直接相邻种群的往返：食物制约或天敌制约。展开更多后，才分析经过所选观察种群的较长回路；这些回路除起点外不重复节点。闭合后反向作用于初始变化，标为负反馈；同向强化初始变化，标为正反馈。<strong>竞争和跨链作用不自动等于负反馈。</strong></p><p>真实生态系统中，多条回路同时作用。整体能否稳定，还取决于作用强度、密度制约、时滞和外界条件，不能仅凭某一负反馈回路作保证。</p>`};
+cards.model={title:'本页分析的是机制路径，不是数量预测',body:`<h3>从食物网建立影响方向</h3><p>灰色箭头始终表示<strong>食物 → 取食者</strong>。彩色箭头表示当前追踪的种群影响：食物对取食者有正向支持（＋），取食者对食物种群有负向作用（−）。影响方向与能量流动方向不同；反向影响不意味着能量逆向流动。</p><h3>符号怎样理解？</h3><p>＋ 表示前者增多时，对后者增长有促进趋势；− 表示前者增多时，对后者增长有抑制趋势。若前者减少，沿该作用的响应方向反转。沿一条路径依次推演，假设其他作用暂不改变。动画步骤是逻辑顺序，不是实测响应时间。</p><p>生物旁的 ↑ / ↓ 表示<strong>该路径带来的变化趋势</strong>，不是整网最终数量。回到起点的“反馈”标记表示对最初变化的反馈作用，不表示已经越过初始基准。</p><h3>怎样处理多路径？</h3><p>路径枚举覆盖 7 种生物的全部 42 组不同种群的有序组合。开放路径不重复节点；闭合回路只在末尾重复起点。默认保留最短影响路径，并补充一条最短的相反方向路径；直接负反馈只经过一个相邻种群。点击“展开更多”再查看完整路径或经由所选种群的回路。最短仅表示最容易讲清楚，不代表真实作用最强。正向和反向影响并存时，整网净变化标为待定，不按路线条数估计强弱。</p><p>只考虑本图所列取食联系。共享资源的竞争、共同天敌的间接作用通过中间生物展开；未另加竞争边，避免重复计算。未建模的行为、食性转换、资源补给与时滞可能改变真实结果。</p><p class="source">知识核对：<a href="https://www.nature.com/articles/ncomms12644" target="_blank" rel="noopener">Frost 等，2016：跨食物网的共同天敌作用与多路径预测</a>；<a href="https://www.biointeractive.org/sites/default/files/Trophic-Cascade-card-activity.pdf" target="_blank" rel="noopener">HHMI BioInteractive：营养级联课堂活动</a>。</p>`};
 function currentTrace(){return I.trace(state.routes[state.route].nodes,state.change);}
 const trend=v=>v>0?'↑':'↓',verb=v=>v>0?'增多':'减少';
 function updatePlay(){
@@ -83,6 +83,14 @@ function syncPair(){
  $('source').value=state.source;$('target').value=state.target;$('change').value=String(state.change);
  [...$('target').options].forEach(o=>o.disabled=o.value===state.source);
  all('[data-preset]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.preset===state.preset));
+ const direct=state.view==='loops'&&!state.advanced;
+ $('target').disabled=direct;$('swap').disabled=direct;$('target').closest('label').hidden=direct;$('swap').hidden=direct;all('.pair-arrow').forEach(e=>e.hidden=direct);
+ $('target-caption').textContent=state.view==='loops'?'经由':'观察';
+ $('pair-hint').textContent=direct?'直接反馈只需选择起始种群':'任意两种生物都可选';
+ if(direct){
+  $('pair-description').innerHTML=`<strong>${name(state.source)} ${trend(state.change)} <span>怎样受到制约？</span></strong><div><span>仅经一个相邻种群，回到起点</span></div>`;
+  $('scene-title').textContent=`${name(state.source)}的最直接负反馈`;return;
+ }
  const relation=I.relationship(state.source,state.target),labels=[];
  if(relation.direct)labels.push('直接取食联系');
  if(relation.sharedFood.length)labels.push(`竞争：共享${relation.sharedFood.map(name).join('、')}`);
@@ -92,11 +100,15 @@ function syncPair(){
  $('scene-title').textContent=state.view==='paths'?`${name(state.source)}的变化，怎样影响${name(state.target)}？`:`经过${name(state.target)}，作用怎样回到${name(state.source)}？`;
 }
 function refreshRoutes(preferred){
- state.routes=state.view==='loops'?I.loops(state.source,state.target):I.paths(state.source,state.target);
+ state.allRoutes=state.view==='loops'?I.loops(state.source,state.target):I.paths(state.source,state.target);
+ state.routes=state.advanced?state.allRoutes:state.view==='loops'?I.directLoops(state.source):I.teachingPaths(state.source,state.target);
+ $('more-routes').textContent=state.advanced?'收起更多':'展开更多';
+ $('more-routes').setAttribute('aria-expanded',String(state.advanced));
+ $('scope-note').textContent=state.advanced?(state.view==='loops'?'拓展：经过所选种群的回路':'拓展：全部简单路径'):(state.view==='loops'?'默认：食物或天敌的直接制约':'默认：最短路径；补充最短反向路径');
  state.route=Math.max(0,preferred?state.routes.findIndex(r=>r.nodes.join()===preferred.join()):0);
  state.step=0;state.playing=false;state.elapsed=0;
  $('route-select').innerHTML=state.routes.map((r,i)=>`<option value="${i}">${i+1}. ${r.nodes.map(name).join(' → ')}${state.view==='loops'?(r.sign<0?' · 负反馈':' · 正反馈'):''}</option>`).join('');
- $('route-label').textContent=state.view==='loops'?'选择闭合回路':'选择影响路径';
+ $('route-label').textContent=state.view==='loops'?(state.advanced?'选择拓展回路':'选择直接制约'):'选择影响路径';
  $('route-select').setAttribute('aria-label',state.view==='loops'?'选择闭合回路':'选择影响路径');
  all('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===state.view));
  syncPair();renderInfluence();
@@ -119,7 +131,7 @@ function renderInfluenceGraph(trace){
   let label=value===null?'':`${trend(value)}`;
   if(s.id===state.source)label=index===trace.nodes.length-1&&trace.kind!=='open'?`反馈${trend(value)}`:`初${trend(state.change)}`;
   
-  return `<button class="organism ${active.has(s.id)?'route-member':'dim'} ${s.id===state.source?'source-node':''} ${s.id===state.target?'target-node':''} ${index===state.step?'current-node':''}" data-species="${s.id}" style="left:${s.x}%;top:${s.y}%;--col:${s.cell%4};--row:${Math.floor(s.cell/4)}" aria-label="将${s.name}设为观察种群" ${s.id===state.source?'disabled':''}><div class="art" aria-hidden="true"></div><span class="name">${s.name}<span class="change-badge ${value>0?'rising':value<0?'falling':''}" ${label?'':'hidden'}>${label}</span></span></button>`;
+  return `<button class="organism ${active.has(s.id)?'route-member':'dim'} ${s.id===state.source?'source-node':''} ${s.id===(state.view==='loops'&&!state.advanced?trace.nodes[1]:state.target)?'target-node':''} ${index===state.step?'current-node':''}" data-species="${s.id}" style="left:${s.x}%;top:${s.y}%;--col:${s.cell%4};--row:${Math.floor(s.cell/4)}" aria-label="${state.view==='loops'&&!state.advanced?`查看经${s.name}的直接反馈`:`将${s.name}设为观察种群`}" ${s.id===state.source||(state.view==='loops'&&!state.advanced&&!I.effect(state.source,s.id))?'disabled':''}><div class="art" aria-hidden="true"></div><span class="name">${s.name}<span class="change-badge ${value>0?'rising':value<0?'falling':''}" ${label?'':'hidden'}>${label}</span></span></button>`;
  }).join('');
  $('edge-layer').innerHTML=M.edges.map(([a,b])=>`<path d="${routeGeometry(a,b).d}" class="food-edge" marker-end="url(#arrow)"/>`).join('');
  $('influence-layer').innerHTML=trace.effects.slice(0,state.step).map((e,i)=>{
@@ -143,24 +155,25 @@ function renderAssessment(trace){
  if(state.view==='loops'){
   $('result-title').textContent=finished?(trace.sign<0?'回到起点：负反馈':'回到起点：正反馈'):'还没走完：继续追踪到起点';
   $('result-text').textContent=finished?(trace.sign<0?`回传作用与${name(state.source)}最初${verb(state.change)}的方向相反，抑制最初的变化。回调不等于一定恢复原数量。`:`回传作用与${name(state.source)}最初${verb(state.change)}的方向相同，强化最初的变化。这条回路不是负反馈。`):'看到另一种生物变化，还不构成反馈；必须看作用如何传回最初的种群。';
-  $('compare-title').textContent='比较两类回路';
-  $('analysis-note').textContent='回路性质不等于整网稳定性；强弱与时滞也重要。';
+  $('compare-title').textContent=state.advanced?'比较两类回路':'比较直接制约';
+  $('analysis-note').textContent=state.advanced?'拓展回路不代表主要调节机制；不能按条数判断强弱。':'最短是讲解顺序，不表示真实作用最强。';
  }else{
-  const summary=I.summary(state.routes);
+  const summary=I.summary(state.allRoutes);
   $('result-title').textContent=finished?`仅沿此路：${name(state.target)}呈${verb(trace.changes.at(-1))}趋势`:'逐段推演，不提前合并结果';
   $('result-text').textContent=summary.net==='undetermined'?'整网净变化待定：存在方向相反的路径。不能按路径条数投票，需要作用强度和响应时间等条件。':'所列路径的方向一致，但这仍是条件性判断，不是最终数量或恢复时间的预测。';
   $('compare-title').textContent='换一路，再比较';
   $('analysis-note').textContent='要判断负反馈，切换到“② 闭合反馈”。';
  }
- const candidates=[1,-1].map(sign=>({sign,index:state.routes.findIndex(r=>r.sign===sign)})).filter(c=>c.index>=0);
+ const direct=state.view==='loops'&&!state.advanced;
+ const candidates=direct?['consumption','food'].map(kind=>({kind,index:state.routes.findIndex(r=>r.effects[0].mechanism===kind)})).filter(c=>c.index>=0):[1,-1].map(sign=>({sign,index:state.routes.findIndex(r=>r.sign===sign)})).filter(c=>c.index>=0);
  $('compare-routes').innerHTML=candidates.map(c=>{
- const r=state.routes[c.index],label=state.view==='loops'?(c.sign<0?'负反馈回路':'正反馈回路'):`${name(state.target)} ${trend(c.sign*state.change)} 的路径`;
+ const r=state.routes[c.index],label=direct?(c.kind==='consumption'?'食物制约':'天敌制约'):state.view==='loops'?(c.sign<0?'负反馈回路':'正反馈回路'):`${name(state.target)} ${trend(c.sign*state.change)} 的路径`;
  return `<button data-compare="${c.index}" aria-pressed="${c.index===state.route}"><b>${label}</b><span>${r.nodes.map(name).join(' → ')}</span></button>`;
  }).join('');
 }
 function renderInfluence(){
  const trace=currentTrace();$('route-select').value=String(state.route);$('route-count').textContent=`${state.route+1} / ${state.routes.length} 条`;
- renderInfluenceGraph(trace);explainStep(trace);renderAssessment(trace);
+ renderInfluenceGraph(trace);explainStep(trace);renderAssessment(trace);if(state.view==='loops'&&!state.advanced)$('scene-title').textContent=`${trace.effects[0].mechanism==='consumption'?'食物制约':'天敌制约'}：经${name(trace.nodes[1])}回到${name(state.source)}`;
  $('influence-chain').innerHTML=trace.nodes.map((id,i)=>`${i?`<span class="route-arrow ${i<=state.step?'reached':''}">${trace.effects[i-1].sign>0?'＋':'−'} →</span>`:''}<button data-step="${i}" aria-pressed="${i===state.step}" class="${i<=state.step?'reached':''}">${name(id)}<b>${i<=state.step?trend(trace.changes[i]):'·'}</b>${i===trace.nodes.length-1&&trace.kind!=='open'?'<small>回到起点</small>':''}</button>`).join('');
  setSelection('本路径推演','增减标记表示影响趋势；没有把各路影响相加为实际数量。');updatePlay();
 }
@@ -184,18 +197,19 @@ function chooseRoute(index,finished=false){state.route=Number(index);state.step=
 function pairChanged(){state.preset='';if(state.target===state.source)state.target=M.species.find(s=>s.id!==state.source).id;refreshRoutes();}
 $('source').innerHTML=$('target').innerHTML=M.species.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 all('button[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
-all('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=presets[b.dataset.preset];Object.assign(state,{source:p.source,target:p.target,preset:b.dataset.preset,view:'paths',change:1});refreshRoutes(p.path);}));
+all('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=presets[b.dataset.preset];Object.assign(state,{source:p.source,target:p.target,preset:b.dataset.preset,view:'paths',advanced:false,change:1});refreshRoutes(p.path);}));
 $('source').addEventListener('change',e=>{state.source=e.target.value;pairChanged();});
 $('target').addEventListener('change',e=>{state.target=e.target.value;pairChanged();});
 $('change').addEventListener('change',e=>{state.change=Number(e.target.value);state.step=0;state.playing=false;syncPair();renderInfluence();});
 $('swap').addEventListener('click',()=>{[state.source,state.target]=[state.target,state.source];pairChanged();});
-all('[data-view]').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;refreshRoutes(state.view==='paths'?presets[state.preset]?.path:null);}));
+all('[data-view]').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;state.advanced=false;refreshRoutes(state.view==='paths'?presets[state.preset]?.path:null);}));
+$('more-routes').addEventListener('click',()=>{const nodes=currentTrace().nodes;state.advanced=!state.advanced;refreshRoutes(nodes);});
 $('route-select').addEventListener('change',e=>chooseRoute(e.target.value));
 $('compare-routes').addEventListener('click',e=>{const b=e.target.closest('[data-compare]');if(b)chooseRoute(b.dataset.compare,true);});
 $('influence-chain').addEventListener('click',e=>{const b=e.target.closest('[data-step]');if(b)seek(Number(b.dataset.step));});
 $('back-step').addEventListener('click',()=>seek(state.step-1));$('next-step').addEventListener('click',()=>seek(state.step+1));
 $('chain-list').addEventListener('click',e=>{const b=e.target.closest('[data-chain]');if(!b)return;state.chain=Number(b.dataset.chain);state.selected=null;updateChains();renderGraph();});
-$('organisms').addEventListener('click',e=>{const b=e.target.closest('[data-species]');if(!b)return;if(state.mode==='feedback'){if(b.dataset.species===state.source)return;state.target=b.dataset.species;pairChanged();return;}state.selected=state.selected===b.dataset.species?null:b.dataset.species;if(state.mode==='web')state.chain=null;updateChains();renderGraph();});
+$('organisms').addEventListener('click',e=>{const b=e.target.closest('[data-species]');if(!b)return;if(state.mode==='feedback'){if(b.dataset.species===state.source)return;if(state.view==='loops'&&!state.advanced){const i=state.routes.findIndex(r=>r.nodes[1]===b.dataset.species);if(i>=0)chooseRoute(i);return;}state.target=b.dataset.species;pairChanged();return;}state.selected=state.selected===b.dataset.species?null:b.dataset.species;if(state.mode==='web')state.chain=null;updateChains();renderGraph();});
 $('play').addEventListener('click',()=>{if(state.mode==='feedback'&&state.step>=currentTrace().effects.length){state.step=0;renderInfluence();}state.playing=!state.playing;state.elapsed=0;updatePlay();});
 $('reset').addEventListener('click',()=>{if(state.mode==='feedback')seek(0);else{state.selected=null;state.chain=state.mode==='levels'?4:null;updateChains();renderGraph();}});
 all('[data-card]').forEach(b=>b.addEventListener('click',()=>{const c=cards[b.dataset.card];$('dialog-title').textContent=c.title;$('dialog-body').innerHTML=c.body;dialogResume=state.playing;state.playing=false;updatePlay();$('knowledge-dialog').showModal();}));

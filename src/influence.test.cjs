@@ -57,3 +57,12 @@ test('全部42组有序种群组合可分析；路径不重复节点，闭环只
  assert.deepEqual(I.paths('mouse','mouse'),[]);assert.deepEqual(I.paths('unknown','frog'),[]);
  assert.throws(()=>I.trace(['mouse','rabbit'],1));
 });
+test('课堂默认反馈只经过一个直接相邻物种，昆虫有食物与天敌两条',()=>{
+ assert.deepEqual(I.directLoops('hopper').map(r=>r.nodes),[['hopper','grass','hopper'],['hopper','frog','hopper']]);
+ for(const s of M.species){const loops=I.directLoops(s.id);assert.ok(loops.length);for(const r of loops){assert.equal(r.nodes.length,3);assert.equal(r.sign,-1);}}
+});
+test('课堂影响路径保留最短路线和最短反向解释，完整枚举不丢失',()=>{
+ const full=I.paths('hawk','mouse'),simple=I.teachingPaths('hawk','mouse');
+ assert.ok(path(simple,['hawk','mouse']));assert.ok(path(simple,['hawk','snake','mouse']));assert.ok(simple.length<full.length);
+ for(const a of M.species)for(const b of M.species)if(a.id!==b.id){const all=I.paths(a.id,b.id),chosen=I.teachingPaths(a.id,b.id);assert.ok(chosen.length);assert.equal(chosen[0].nodes.length,all[0].nodes.length);assert.deepEqual(new Set(chosen.map(r=>r.sign)),new Set(all.map(r=>r.sign)));}
+});
