@@ -6,6 +6,8 @@
 
 ## 使用
 
+[打开在线演示](https://meiosis7.github.io/food-web-feedback-interactive/)
+
 下载 `index.html` 后用浏览器打开即可离线使用，图片、样式和脚本均已内嵌，无需安装依赖。
 
 - **食物网**：7 种生物、10 条取食关系、5 条完整食物链，点击生物或食物链查看联系。
