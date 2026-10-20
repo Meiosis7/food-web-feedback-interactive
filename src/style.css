@@ -46,3 +46,6 @@
 @media(max-width:850px){.layout{grid-template-rows:minmax(300px,1.08fr) minmax(270px,.92fr)}}
 @media(max-width:460px){.layout{grid-template-rows:minmax(300px,1.02fr) minmax(280px,.98fr)}}
 @media(max-width:850px){.influence-chain{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}.influence-chain>*{flex-shrink:0}}
+
+/* PDF review: keep the full title in one consistent style. */
+.heading h1>span{display:inline;font-size:inherit;background:none;border:0;box-shadow:none;margin:0;padding:0;transform:none}
