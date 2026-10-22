@@ -49,3 +49,6 @@
 
 /* PDF review: keep the full title in one consistent style. */
 .heading h1>span{display:inline;font-size:inherit;background:none;border:0;box-shadow:none;margin:0;padding:0;transform:none}
+
+/* Unified book header: keep the complete text visible on phones. */
+header .brand{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.5;flex-wrap:wrap}header .brand b{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.5}header .topbar{justify-content:flex-start}
