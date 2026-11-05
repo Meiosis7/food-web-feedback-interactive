@@ -57,8 +57,9 @@ header .brand{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhe
  display:inline-block;
  padding:1px 3px;
  border-radius:4px;
- background:#fffbed;
- color:var(--ink);
+ background:#fff;
+ color:#153a6a;
+ border:1px solid #b5c7dc;
  font-size:clamp(10px,1.1vw,12px);
  font-weight:700;
  line-height:1.4;
