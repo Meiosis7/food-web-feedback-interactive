@@ -3,7 +3,8 @@
 const M=window.FoodWebModel,I=window.FoodWebInfluence,$=id=>document.getElementById(id),all=s=>[...document.querySelectorAll(s)];
 const name=id=>M.species.find(s=>s.id===id).name,CN=['','一','二','三','四','五'],chains=M.chains();
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const state={mode:'feedback',chain:null,selected:null,playing:false,source:'mouse',target:'hawk',change:1,view:'paths',advanced:false,allRoutes:[],route:0,step:0,routes:[],elapsed:0,preset:'predation'};
+const loopButton=document.querySelector('[data-view=loops]');
+const state={mode:document.body.dataset.mode,chain:null,selected:null,playing:false,source:'mouse',target:'hawk',change:1,view:'paths',advanced:false,allRoutes:[],route:0,step:0,routes:[],elapsed:0,preset:'predation'};
 let last=0,dialogResume=false;
 function chainMarkup(c){return c.map(name).join('<i>→</i>');}
 function setSelection(title,text){$('selection-line').innerHTML=`<b>${title}</b><span>${text}</span>`;}
@@ -69,7 +70,7 @@ const presets={
  cross:{source:'rabbit',target:'frog',path:['rabbit','hawk','frog']},
  multiple:{source:'hawk',target:'mouse',path:['hawk','mouse']}
 };
-cards.stability={title:'先看影响，再闭合回路判断负反馈',body:`<h3>两种生物的关系，不等于反馈回路</h3><p>鼠增多使鹰得到更多食物，是从鼠到鹰的影响。还要继续看：鹰的增长又增强对鼠的捕食，<strong>作用回到鼠，抑制鼠最初的增长</strong>，才构成负反馈。</p><p class="callout">鼠增多 → 鹰增长受促进 → 鼠增长受抑制。<br>负反馈抑制最初的变化；并不保证立刻回到原数量。</p><h3>竞争、隔级和跨链，怎样分析？</h3><p><strong>共享资源：</strong>鼠增多 → 草受取食压力增强 → 兔的食物减少，是经过草传递的竞争作用。<br><strong>间隔营养级：</strong>蛙增多 → 食草昆虫受捕食压力增强 → 草受取食压力减弱，是沿链的间接影响。<br><strong>非同一食物链：</strong>兔与蛙可经共同捕食者鹰相互联系，即使没有一条捕食食物链同时包含兔与蛙。</p><h3>同一对生物，可以有相反路径</h3><p>鹰直接捕食鼠，对鼠有抑制作用；鹰抑制蛇，又可能减轻蛇对鼠的捕食。这两条路径方向相反，不能只看其中一条，或用路径数量“多数表决”。</p><h3>怎样辨认回路性质？</h3><p>本页“闭合反馈”默认只看起始种群与一个直接相邻种群的往返：食物制约或天敌制约。展开更多后，才分析经过所选观察种群的较长回路；这些回路除起点外不重复节点。闭合后反向作用于初始变化，标为负反馈；同向强化初始变化，标为正反馈。<strong>竞争和跨链作用不自动等于负反馈。</strong></p><p>真实生态系统中，多条回路同时作用。整体能否稳定，还取决于作用强度、密度制约、时滞和外界条件，不能仅凭某一负反馈回路作判断。</p>`};
+cards.stability={title:'先看影响，再闭合回路判断负反馈',body:`<h3>两种生物的关系，不等于反馈回路</h3><p>鼠增多使鹰得到更多食物，是从鼠到鹰的影响。还要继续看：鹰的增长又增强对鼠的捕食，<strong>作用回到鼠，抑制鼠最初的增长</strong>，才构成负反馈。</p><p class="callout">鼠增多 → 鹰增长受促进 → 鼠增长受抑制。<br>负反馈抑制最初的变化；并不保证立刻回到原数量。</p><h3>竞争、隔级和跨链，怎样分析？</h3><p><strong>共享资源：</strong>鼠增多 → 草受取食压力增强 → 兔的食物减少，是经过草传递的竞争作用。<br><strong>间隔营养级：</strong>蛙增多 → 食草昆虫受捕食压力增强 → 草受取食压力减弱，是沿链的间接影响。<br><strong>非同一食物链：</strong>兔与蛙可经共同捕食者鹰相互联系，即使没有一条捕食食物链同时包含兔与蛙。</p><h3>同一对生物，可以有相反路径</h3><p>鹰直接捕食鼠，对鼠有抑制作用；鹰抑制蛇，又可能减轻蛇对鼠的捕食。这两条路径方向相反，不能只看其中一条，或用路径数量“多数表决”。</p><h3>怎样辨认回路性质？</h3><p>选中的两个种群有直接取食联系时，可进入“闭合反馈”，先看起始种群与直接相邻种群之间的食物制约或天敌制约。没有直接取食联系时，可用“追踪影响”分析间接作用。展开更多后，才分析经过所选观察种群的较长回路；这些回路除起点外不重复节点。闭合后反向作用于初始变化，标为负反馈；同向强化初始变化，标为正反馈。<strong>竞争和跨链作用不自动等于负反馈。</strong></p><p>真实生态系统中，多条回路同时作用。整体能否稳定，还取决于作用强度、密度制约、时滞和外界条件，不能仅凭某一负反馈回路作判断。</p>`};
 cards.model={title:'分析方法与适用边界',body:`<h3>从食物网建立影响方向</h3><p>灰色箭头始终表示<strong>食物 → 取食者</strong>。彩色箭头表示当前追踪的种群影响：食物对取食者有正向支持（＋），取食者对食物种群有负向作用（−）。影响方向与能量流动方向不同；反向影响不意味着能量逆向流动。</p><h3>符号怎样理解？</h3><p>＋ 表示前者增多时，对后者增长有促进趋势；− 表示一种生物数量增加，会抑制另一种生物的种群增长。例如：蛇增多 → 鼠受到的捕食压力增大 → 鼠的种群增长受抑制。若前者减少，沿该作用的响应方向反转。沿一条路径依次推演，假设其他作用暂不改变。动画步骤是逻辑顺序，不是实测响应时间。</p><p>生物旁的 ↑ / ↓ 表示<strong>该路径带来的变化趋势</strong>，不是整网最终数量。回到起点的“反馈”标记表示对最初变化的反馈作用，不表示已经越过初始基准。</p><h3>怎样处理多路径？</h3><p>路径覆盖本图 7 种生物之间所有可能存在影响的组合。默认保留最短影响路径，并补充一条最短的相反方向路径。点击“展开更多”再查看完整路径或经由所选种群的回路。最短仅表示最容易讲清楚，不代表真实作用最强。正向和反向影响并存时，整网净变化标为待定，不按路线条数估计强弱。</p><p>只考虑本图所列取食联系。未建模的行为、食性转换、资源补给与时滞可能改变真实结果。</p>`};
 function currentTrace(){return I.trace(state.routes[state.route].nodes,state.change);}
 const trend=v=>v>0?'↑':'↓',verb=v=>v>0?'增多':'减少';
@@ -100,6 +101,11 @@ function syncPair(){
  $('scene-title').textContent=state.view==='paths'?`${name(state.source)}的变化，怎样影响${name(state.target)}？`:`经过${name(state.target)}，作用怎样回到${name(state.source)}？`;
 }
 function refreshRoutes(preferred){
+ loopButton.disabled=!I.effect(state.source,state.target);
+ loopButton.title=loopButton.disabled?'当前两种群没有直接取食联系，可追踪间接影响。':'';
+ if(loopButton.disabled&&state.view==='loops'){
+  state.view='paths';state.advanced=false;
+ }
  state.allRoutes=state.view==='loops'?I.loops(state.source,state.target):I.paths(state.source,state.target);
  state.routes=state.advanced?state.allRoutes:state.view==='loops'?I.directLoops(state.source):I.teachingPaths(state.source,state.target);
  $('more-routes').textContent=state.advanced?'收起更多':'展开更多';
@@ -163,7 +169,7 @@ function renderAssessment(trace){
   $('result-title').textContent=finished?`仅沿此路：${name(state.target)}呈${verb(trace.changes.at(-1))}趋势`:'逐段推演，不提前合并结果';
   $('result-text').textContent=summary.net==='undetermined'?'整网净变化待定：存在方向相反的路径。不能按路径条数投票，需要作用强度和响应时间等条件。':'所列路径的方向一致，但这仍是条件性判断，不是最终数量或恢复时间的预测。';
   $('compare-title').textContent='换一路，再比较';
-  $('analysis-note').textContent='要判断负反馈，切换到“② 闭合反馈”。';
+  $('analysis-note').textContent=loopButton.disabled?'当前两种群没有直接取食联系，可追踪间接影响。':'要判断负反馈，切换到“② 闭合反馈”。';
  }
  const direct=state.view==='loops'&&!state.advanced;
  const candidates=direct?['consumption','food'].map(kind=>({kind,index:state.routes.findIndex(r=>r.effects[0].mechanism===kind)})).filter(c=>c.index>=0):[1,-1].map(sign=>({sign,index:state.routes.findIndex(r=>r.sign===sign)})).filter(c=>c.index>=0);
@@ -220,5 +226,5 @@ $('knowledge-dialog').addEventListener('close',()=>{state.playing=dialogResume;u
 $('fullscreen').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('lesson').requestFullscreen();}catch{setSelection('未开启全屏','可将浏览器窗口最大化继续演示。');}});
 document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'退出全屏 ↙':'全屏演示 ↗';});
 function tick(now){const dt=Math.min(.15,(now-last)/1000);last=now;if(state.playing&&state.mode==='feedback'&&!document.hidden){state.elapsed+=dt;if(state.elapsed>=1.8){state.elapsed=0;state.step=Math.min(state.step+1,currentTrace().effects.length);if(state.step===currentTrace().effects.length)state.playing=false;renderInfluence();}}requestAnimationFrame(tick);}
-setMode('feedback');requestAnimationFrame(tick);
+setMode(state.mode);requestAnimationFrame(tick);
 })();

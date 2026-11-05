@@ -52,3 +52,25 @@
 
 /* Unified book header: keep the complete text visible on phones. */
 header .brand{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.5;flex-wrap:wrap}header .brand b{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.5}header .topbar{justify-content:flex-start}
+
+.level-tag span{
+ display:inline-block;
+ padding:1px 3px;
+ border-radius:4px;
+ background:#fffbed;
+ color:var(--ink);
+ font-size:clamp(10px,1.1vw,12px);
+ font-weight:700;
+ line-height:1.4;
+ white-space:nowrap;
+}
+
+/* Keep the footer below the content when the stacked panels exceed the viewport. */
+@media(max-width:850px){
+ body[data-mode=feedback]{height:auto;min-height:max(760px,100dvh)}
+ body[data-mode=feedback] main{margin:0 auto;min-height:auto}
+ body[data-mode=feedback] .layout{flex-shrink:0}
+}
+@media(max-width:460px){
+ body[data-mode=feedback]{min-height:max(780px,100dvh)}
+}
